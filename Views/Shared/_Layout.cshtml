@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewBag.Title - My Kendo UI MVC Application</title>
+
+    <link href="https://kendo.cdn.telerik.com/themes/6.2.0/default/default-ocean-blue.css" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+   
+    <script src="https://cdn.kendostatic.com/2023.1.314/js/jquery.min.js"></script>
+    <script src="https://cdn.kendostatic.com/2023.1.314/js/jszip.min.js"></script>
+    <script src="https://cdn.kendostatic.com/2023.1.314/js/kendo.all.min.js"></script>
+    <script src="https://cdn.kendostatic.com/2023.1.314/js/kendo.aspnetmvc.min.js"></script>
+
+    <script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+
+
+</head>
+<body class="k-content">
+    <label title="Orders here"></label>
+    <main>
+
+        <div class="container">
+            <label title="container Orders here"></label>
+
+            @RenderBody()
+        </div>
+    </main>
+
+
+    <footer class="footer text-center d-flex align-items-center">
+        <div class="container pb-0">
+            <hr />
+            <p>Copyright &copy; @DateTime.Now.Year Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

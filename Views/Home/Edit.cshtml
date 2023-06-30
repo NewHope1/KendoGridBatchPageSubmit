@@ -1,0 +1,165 @@
+﻿@model KendoGridBatchPageSubmit.Customer
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Kendo.Mvc.UI
+
+@using (Html.BeginForm())
+{
+    @* 
+       Kendo Grid doesn't' return its rows when submitted with the view submit button, so 
+       we use these hidden fields to send the rows to the controller
+    *@
+    @Html.Hidden("CreatedRowsData");
+    @Html.Hidden("UpdatedRowsData");
+    @Html.Hidden("DeletedRowsData");
+
+    <div class="border border-5 p-0 border-dark col-7">
+        <div class="border border-5 p-2">
+            <h2 class="text-center">Customer and Orders</h2>
+
+            <style>
+                .k-grid .k-grid-header .k-header {
+                    border-bottom: none;
+                    background-color: dodgerblue;
+                }
+
+                    .k-grid .k-grid-header .k-header a {
+                        color: black;
+                    }
+            </style>
+
+            <div class="container">
+
+                <h4 class="mb-2">Customer</h4>
+
+                <div class="row align-items-end mb-4">
+                    <div class="col-2">
+                        @Html.LabelFor(m => m.CustomerID)
+                        @Html.TextBoxFor(m => m.CustomerID, new { @class = "form-control border-dark", @placeholder = "", style = "width:8em;" })
+                    </div>
+
+                    <div class="col">
+                        <input id="lookupOrdersBtn" name="lookupBtn" type="submit" onclick="javascript:Submit();" class="btn btn-primary" value="Lookup Orders >>" />
+                    </div>
+                </div>
+
+                <div class="row col-12 mb-4  k-border-solid p-2">
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.ContactName, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.ContactName, new { @class = "form-control border-dark", @placeholder = "", style = "width:8em;" })
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.ContactTitle, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.ContactTitle, new { @class = "form-control border-dark", @placeholder = "", style = "width:8em;" })
+                    </div>
+
+                    <div class="col-4 mb-3 k-ml-0 ">
+                        @Html.LabelFor(m => m.Address, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control border-dark", @placeholder = "", style = "width:17em;" })
+                    </div>
+                </div>
+
+                <h4>Orders</h4>
+
+                <div class="row h-15 k-border-solid col-12 mb-3">
+
+                  @(Html.Kendo().Grid<KendoGridBatchPageSubmit.Order>()
+                    .Name("grid")
+                    .Columns(col =>
+                                {
+                                    col.Bound(o => o.OrderID).Width(100);
+                                    col.Bound(o => o.OrderDate).EditorTemplateName("Date").Format("{0:d}").Width(100);
+                                    col.Bound(o => o.Freight).Width(20);
+                                    col.Bound(o => o.ShipCity).Width(100);
+                                    col.Bound(o => o.ShipCountry).Width(100);
+
+                                    col.Command(command =>
+                                    {
+                                        command.Destroy(); // Show Delete button
+                                    }
+                                );
+                                }
+                            )
+
+                    .Editable(editable => editable.Mode(GridEditMode.InCell)) // Edit in cell
+
+                    .ToolBar(tools =>
+                                {
+                                    tools.Create(); // "Add new record" button
+                                }
+                            )
+
+                    .Pageable().Sortable().Filterable()
+
+                    .DataSource(source => source.Ajax().Model(model =>
+                                                                {
+                                                                    model.Id(o => o.OrderID);
+                                                                    model.Field(o => o.OrderID).Editable(false); // Order Id is read-only
+                                                                }
+                                                             )
+
+                                .Read(read => read.Action("Read_Orders", "Home", new { customerId = (Model != null) ? Model.CustomerID : "" }))
+                                .Batch(true) // If you don't set it to true, the list of rows passed into the Update/Create/Update handlers would be null
+
+                               )
+                    )
+
+</div>
+
+                <div class="row  align-items-center justify-content-center">
+                    <div class="col-2">
+                        <input type="submit" name="submitBtn" id="saveObsBtn" value="Submit" class="btn btn-primary" />
+                    </div>
+                </div>
+
+            </div>
+
+            <script>
+                // Handler called when clicking Save button on form
+                $("#saveObsBtn").click(function ()
+                {
+                    var grid = $("#grid").data("kendoGrid");
+
+                    //get the new and the updated rows
+                    var currentData = grid.dataSource.data();
+                    var updatedRecords = [];
+                    var newRecords = [];
+
+                    for (var i = 0; i < currentData.length; i++)
+                    {
+                        if (currentData[i].isNew())
+                        {
+                            //this row is new
+                            newRecords.push(currentData[i]);
+                        }
+                        else if (currentData[i].dirty)
+                        {
+                            //this row is updated
+                            updatedRecords.push(currentData[i].toJSON());
+                        }
+                    }
+
+                    //get the deleted rows
+                    var deletedRecords = [];
+                    for (var i = 0; i < grid.dataSource._destroyed.length; i++)
+                    {
+                        deletedRecords.push(grid.dataSource._destroyed[i].toJSON());
+                    }
+
+                    //added, updated and deleted rows will be picked up from these fields on the server
+                    $('#CreatedRowsData').val(kendo.stringify(newRecords));
+                    $('#UpdatedRowsData').val(kendo.stringify(updatedRecords));
+                    $('#DeletedRowsData').val(kendo.stringify(deletedRecords));
+
+                })
+            </script>
+
+        </div>
+    </div>
+
+}
+
