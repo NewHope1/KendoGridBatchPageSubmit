@@ -157,7 +157,7 @@ namespace KendoGridBatchPageSubmit.Controllers
             {
                 var fields = rec.Split(',');
 
-                // loop through the record fields
+                // loop through the individual record fields
                 foreach (var field in fields)
                 {
                     var fieldName = field.Split(':')[0];
