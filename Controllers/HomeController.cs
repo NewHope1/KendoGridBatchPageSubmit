@@ -142,7 +142,7 @@ namespace KendoGridBatchPageSubmit.Controllers
 
             string tempRecord = record;
             ArrayList recs = new ArrayList();
-            var matcher = new Regex(@"{(.*?)}"); // match all fields in between { and }
+            var matcher = new Regex(@"{(.*?)}"); // match all records in between { and }
             var matches = matcher.Matches(record).Cast<Match>().Select(m => m.Value).Distinct(); // cast to IEnumerable so we can operate on
             foreach (string match in matches)
             {
@@ -152,10 +152,12 @@ namespace KendoGridBatchPageSubmit.Controllers
                 recs.Add(tempRecord);
             };
 
+            // loop through all records (rows) and convert each one into an entity
             foreach (String rec in recs)
             {
                 var fields = rec.Split(',');
 
+                // loop through the record fields
                 foreach (var field in fields)
                 {
                     var fieldName = field.Split(':')[0];
